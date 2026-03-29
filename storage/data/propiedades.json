@@ -1,0 +1,50 @@
+[
+  {
+    "img": "casa1.png",
+    "titulo": "Casa en Zipaquirá",
+    "ciudad": "Zipaquirá",
+    "precio": "$380.000.000",
+    "badge": "En Venta",
+    "badge_class": "badge-venta"
+  },
+  {
+    "img": "casa1.png",
+    "titulo": "Apartamento moderno",
+    "ciudad": "Cajicá",
+    "precio": "$950.000 mensual",
+    "badge": "En Arriendo",
+    "badge_class": "badge-arriendo"
+  },
+  {
+    "img": "casa1.png",
+    "titulo": "Lote campestre",
+    "ciudad": "Cogua",
+    "precio": "$120.000.000",
+    "badge": "En Venta",
+    "badge_class": "badge-venta"
+  },
+  {
+    "img": "casa1.png",
+    "titulo": "Casa con jardín",
+    "ciudad": "Zipaquirá",
+    "precio": "$450.000.000",
+    "badge": "Destacado",
+    "badge_class": "badge-destacado"
+  },
+  {
+    "img": "casa1.png",
+    "titulo": "Apartamento céntrico",
+    "ciudad": "Cajicá",
+    "precio": "$1.100.000 mensual",
+    "badge": "En Arriendo",
+    "badge_class": "badge-arriendo"
+  },
+  {
+    "img": "casa1.png",
+    "titulo": "Lote en zona rural",
+    "ciudad": "Cogua",
+    "precio": "$90.000.000",
+    "badge": "En Venta",
+    "badge_class": "badge-venta"
+  }
+]

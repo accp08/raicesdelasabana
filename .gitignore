@@ -1,0 +1,56 @@
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# Dependency directories
+/vendor/
+/node_modules/
+
+# Build outputs
+/public/build/
+/public/hot
+
+# Laravel runtime files
+/bootstrap/cache/*.php
+/storage/*.key
+/storage/logs/*.log
+/storage/framework/cache/data/*
+/storage/framework/sessions/*
+/storage/framework/testing/*
+/storage/framework/views/*
+
+# Keep framework directories in git when they contain .gitignore placeholders
+!/bootstrap/cache/.gitignore
+!/storage/app/.gitignore
+!/storage/app/private/.gitignore
+!/storage/app/public/.gitignore
+!/storage/framework/cache/.gitignore
+!/storage/framework/cache/data/.gitignore
+!/storage/framework/sessions/.gitignore
+!/storage/framework/testing/.gitignore
+!/storage/framework/views/.gitignore
+!/storage/logs/.gitignore
+
+# Test and tooling artifacts
+/.phpunit.cache/
+/.phpunit.result.cache
+/coverage/
+
+# Logs and debug output
+*.log
+*.err
+*.out
+/public/error_log
+
+# Editor and OS files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Local Codex metadata
+.codex
+
+# Archives and local backups
+*.zip
