@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use App\Models\Property;
 use Illuminate\Http\Response;
-
 class SitemapController extends Controller
 {
     public function index(): Response
@@ -20,12 +19,33 @@ class SitemapController extends Controller
             ->orderByDesc('updated_at')
             ->first(['updated_at']);
 
-        $urls = collect([
-            ['loc' => url('/'), 'lastmod' => $latestPropertyUpdate?->updated_at?->toAtomString(), 'changefreq' => 'daily', 'priority' => '1.0'],
-            ['loc' => url('/propiedades'), 'lastmod' => $latestPropertyUpdate?->updated_at?->toAtomString(), 'changefreq' => 'daily', 'priority' => '0.9'],
-            ['loc' => url('/blog'), 'lastmod' => $latestPostUpdate?->updated_at?->toAtomString(), 'changefreq' => 'weekly', 'priority' => '0.8'],
-            ['loc' => url('/nosotros'), 'changefreq' => 'monthly', 'priority' => '0.7'],
+        $staticUrls = collect([
+            [
+                'loc' => url('/'),
+                'lastmod' => $latestPropertyUpdate?->updated_at?->toAtomString(),
+                'changefreq' => 'daily',
+                'priority' => '1.0',
+            ],
+            [
+                'loc' => url('/nosotros'),
+                'changefreq' => 'monthly',
+                'priority' => '0.7',
+            ],
+            [
+                'loc' => url('/blog'),
+                'lastmod' => $latestPostUpdate?->updated_at?->toAtomString(),
+                'changefreq' => 'weekly',
+                'priority' => '0.8',
+            ],
+            [
+                'loc' => url('/propiedades'),
+                'lastmod' => $latestPropertyUpdate?->updated_at?->toAtomString(),
+                'changefreq' => 'daily',
+                'priority' => '0.9',
+            ],
         ]);
+
+        $urls = collect($staticUrls);
 
         $properties = Property::query()
             ->where('status', 'published')

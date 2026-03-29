@@ -7,17 +7,39 @@
 
 @push('structured_data')
 @php
-    $schema = [
+    $homeWhatsappMessage = 'Hola, quiero información sobre inmuebles disponibles en la Sabana de Bogotá.';
+    $homeWhatsappHref = 'https://wa.me/573150597595?text=' . rawurlencode($homeWhatsappMessage);
+    $organizationSchema = [
         '@context' => 'https://schema.org',
         '@type' => 'RealEstateAgent',
         'name' => 'Raíces de la Sabana',
-        'url' => url('/'),
+        'url' => config('app.url'),
         'telephone' => '+57 3150597595',
         'email' => 'contacto@raicesdelasabana.com',
         'areaServed' => 'Sabana de Bogotá, Cundinamarca',
+        'contactPoint' => [
+            '@type' => 'ContactPoint',
+            'telephone' => '+57 3150597595',
+            'contactType' => 'sales',
+            'areaServed' => 'CO',
+            'availableLanguage' => ['es', 'en'],
+        ],
+    ];
+    $websiteSchema = [
+        '@context' => 'https://schema.org',
+        '@type' => 'WebSite',
+        'name' => 'Raíces de la Sabana',
+        'url' => config('app.url'),
+        'inLanguage' => 'es-CO',
+        'publisher' => [
+            '@type' => 'Organization',
+            'name' => 'Raíces de la Sabana',
+            'url' => config('app.url'),
+        ],
     ];
 @endphp
-<script type="application/ld+json">{!! json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
+<script type="application/ld+json">{!! json_encode($organizationSchema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
+<script type="application/ld+json">{!! json_encode($websiteSchema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
 @endpush
 
 @section('content')
@@ -32,7 +54,7 @@
 
             <div class="hero-actions">
                 <a href="{{ url('/propiedades') }}" class="btn btn-brand">Ver propiedades</a>
-                <a href="tel:+573150597595" class="btn btn-outline-brand">Hablar con un asesor</a>
+                <a href="{{ $homeWhatsappHref }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-brand">Hablar por WhatsApp</a>
             </div>
 
             <div class="search-panel">
@@ -99,7 +121,7 @@
                 <div class="col-md-4">
                     <div class="card shadow-sm h-100 card-property">
                         <div class="position-relative">
-                            <img src="{{ $image }}" class="card-img-top" alt="{{ $propiedad->titulo }}">
+                            <img src="{{ $image }}" class="card-img-top" alt="{{ $propiedad->titulo }}" loading="lazy" decoding="async">
                             <span class="badge {{ $badgeClass }}">{{ $badgeLabel }}</span>
                             @if ($propiedad->is_featured)
                                 <span class="badge badge-featured">⭐ Destacada</span>
@@ -180,8 +202,8 @@
                 <p>Agenda hoy y recibe una propuesta personalizada con opciones que sí encajan contigo.</p>
             </div>
             <div class="cta-actions">
-                <a href="tel:+573150597595" class="btn btn-light">Llamar ahora</a>
-                <a href="https://wa.me/573150597595" class="btn btn-outline-light">Escribir por WhatsApp</a>
+                <a href="{{ $homeWhatsappHref }}" target="_blank" rel="noopener noreferrer" class="btn btn-light">Escribir por WhatsApp</a>
+                <a href="tel:+573150597595" class="btn btn-outline-light">Llamar ahora</a>
             </div>
         </div>
     </div>

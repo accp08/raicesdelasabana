@@ -46,15 +46,6 @@
   gtag('js', new Date());
 
   gtag('config', 'G-C958Y2Y4DK');
-  gtag('config', 'AW-18046393307');
-</script>
-<!-- Event snippet for Contact conversion page -->
-<script>
-  gtag('event', 'conversion', {
-      'send_to': 'AW-18046393307/wUzSCMqO8ZAcENu3mJ1D',
-      'value': 1.0,
-      'currency': 'COP'
-  });
 </script>
 
 </head>
@@ -68,11 +59,12 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     @stack('page_scripts')
     @php
-        $whatsappHref = trim($__env->yieldContent('whatsapp_link')) ?: 'https://wa.me/573150597595';
+        $defaultWhatsappMessage = 'Hola, quiero información sobre inmuebles disponibles en la Sabana de Bogotá.';
+        $whatsappHref = trim($__env->yieldContent('whatsapp_link')) ?: 'https://wa.me/573150597595?text='.rawurlencode($defaultWhatsappMessage);
         $whatsappTitle = trim($__env->yieldContent('whatsapp_title')) ?: 'Escríbenos por WhatsApp';
     @endphp
     <!-- Botón flotante de WhatsApp -->
-<a href="{{ $whatsappHref }}" class="whatsapp-float" target="_blank" title="{{ $whatsappTitle }}">
+<a href="{{ $whatsappHref }}" class="whatsapp-float" target="_blank" rel="noopener noreferrer" title="{{ $whatsappTitle }}" aria-label="{{ $whatsappTitle }}">
     <img src="{{ asset('img/whatsapp-icon.png') }}" alt="WhatsApp" class="whatsapp-icon">
 </a>
 
@@ -97,6 +89,7 @@
                     <li><a href="{{ url('/') }}">Inicio</a></li>
                     <li><a href="{{ url('/propiedades') }}">Propiedades</a></li>
                     <li><a href="{{ url('/nosotros') }}">Nosotros</a></li>
+                    <li><a href="{{ $whatsappHref }}" target="_blank" rel="noopener noreferrer">WhatsApp</a></li>
                     <li><a href="mailto:contacto@raicesdelasabana.com">Contáctenos</a></li>
                 </ul>
             </div>

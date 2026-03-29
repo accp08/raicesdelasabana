@@ -32,6 +32,30 @@
 
 @push('structured_data')
 @php
+    $propertyBreadcrumbs = [
+        '@context' => 'https://schema.org',
+        '@type' => 'BreadcrumbList',
+        'itemListElement' => [
+            [
+                '@type' => 'ListItem',
+                'position' => 1,
+                'name' => 'Inicio',
+                'item' => url('/'),
+            ],
+            [
+                '@type' => 'ListItem',
+                'position' => 2,
+                'name' => 'Propiedades',
+                'item' => route('propiedades.index'),
+            ],
+            [
+                '@type' => 'ListItem',
+                'position' => 3,
+                'name' => $property->titulo,
+                'item' => route('propiedades.show', $property->slug),
+            ],
+        ],
+    ];
     $realEstateSchema = [
         '@context' => 'https://schema.org',
         '@type' => 'RealEstateListing',
@@ -73,6 +97,7 @@
     $realEstateSchema = array_filter($realEstateSchema, fn ($value) => !is_null($value) && $value !== []);
     $realEstateSchema['mainEntity'] = array_filter($realEstateSchema['mainEntity'], fn ($value) => !is_null($value) && $value !== []);
 @endphp
+<script type="application/ld+json">{!! json_encode($propertyBreadcrumbs, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
 <script type="application/ld+json">{!! json_encode($realEstateSchema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
 @endpush
 
@@ -275,6 +300,9 @@
         <div class="contact-card">
             <h3>Agenda una visita</h3>
             <p>Déjanos tus datos y un asesor te contactará pronto.</p>
+            <a href="@yield('whatsapp_link')" target="_blank" rel="noopener noreferrer" class="btn btn-outline-danger w-100 mb-3">
+                Consultar por WhatsApp
+            </a>
             @if (session('status'))
                 <div class="alert alert-success">{{ session('status') }}</div>
             @endif

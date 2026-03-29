@@ -1,0 +1,21 @@
+# Raices de la Sabana
+
+> Inmobiliaria enfocada en compra, venta y arriendo de inmuebles en la Sabana de Bogota, Colombia.
+
+## Sitio
+- URL canónica: https://www.raicesdelasabana.com/
+- Sitemap: https://www.raicesdelasabana.com/sitemap.xml
+
+## Secciones principales
+- Inicio: https://www.raicesdelasabana.com/
+- Propiedades: https://www.raicesdelasabana.com/propiedades
+- Blog: https://www.raicesdelasabana.com/blog
+- Nosotros: https://www.raicesdelasabana.com/nosotros
+
+## Contenido
+- Fichas individuales de propiedades con ciudad, características, precio, imágenes y datos estructurados.
+- Blog con guías y análisis sobre compra, venta, inversión y mercado inmobiliario.
+
+## Contacto
+- Teléfono: +57 315 059 7595
+- Email: contacto@raicesdelasabana.com

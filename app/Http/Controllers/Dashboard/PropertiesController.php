@@ -7,12 +7,13 @@ use App\Http\Requests\PropertyStoreRequest;
 use App\Http\Requests\PropertyUpdateRequest;
 use App\Models\Property;
 use App\Services\ImageOptimizer;
+use App\Services\PropertySlugGenerator;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class PropertiesController extends Controller
 {
-    public function __construct()
+    public function __construct(private readonly PropertySlugGenerator $slugGenerator)
     {
         $this->authorizeResource(Property::class, 'property');
     }
@@ -54,12 +55,6 @@ class PropertiesController extends Controller
     {
         $data = $request->validated();
         $data['property_code'] = $this->generateUniqueCode();
-        $data['slug'] = $this->makeUniqueSlug(
-            Property::class,
-            $data['slug'] ?? $data['titulo'],
-            null,
-            $data['property_code']
-        );
         $data['created_by'] = $request->user()->id;
         $data['updated_by'] = $request->user()->id;
         $data['tipo'] = $this->resolveTipo($data['for_sale'] ?? false, $data['for_rent'] ?? false);
@@ -68,6 +63,7 @@ class PropertiesController extends Controller
             ? $request->boolean('administracion_incluida')
             : null;
         $data['ciudad'] = \App\Models\City::find($data['city_id'])->name ?? $data['ciudad'] ?? '';
+        $data['slug'] = $this->resolvePropertySlug($data, null);
 
         $optimizer = app(ImageOptimizer::class);
 
@@ -120,12 +116,6 @@ class PropertiesController extends Controller
             $propertyCode = $this->generateUniqueCode();
             $data['property_code'] = $propertyCode;
         }
-        $data['slug'] = $this->makeUniqueSlug(
-            Property::class,
-            $data['slug'] ?? $data['titulo'],
-            $property->id,
-            $propertyCode
-        );
         $data['updated_by'] = $request->user()->id;
         $data['tipo'] = $this->resolveTipo($data['for_sale'] ?? false, $data['for_rent'] ?? false);
         $data['is_featured'] = $request->boolean('is_featured');
@@ -133,6 +123,7 @@ class PropertiesController extends Controller
             ? $request->boolean('administracion_incluida')
             : null;
         $data['ciudad'] = \App\Models\City::find($data['city_id'])->name ?? $data['ciudad'] ?? $property->ciudad;
+        $data['slug'] = $this->resolvePropertySlug($data, $property);
 
         $optimizer = app(ImageOptimizer::class);
 
@@ -272,19 +263,12 @@ class PropertiesController extends Controller
         string $modelClass,
         string $value,
         ?int $ignoreId = null,
-        ?string $code = null
     ): string
     {
-        $base = Str::slug($value);
-        if (!empty($code)) {
-            $slug = $base.'-'.Str::lower($code);
-            if (!$this->slugExists($modelClass, $slug, $ignoreId)) {
-                return $slug;
-            }
-        }
+        $base = Str::slug($value) ?: 'propiedad';
 
         $slug = $base;
-        $counter = 1;
+        $counter = 2;
 
         while ($this->slugExists($modelClass, $slug, $ignoreId)) {
             $slug = $base.'-'.$counter;
@@ -292,6 +276,11 @@ class PropertiesController extends Controller
         }
 
         return $slug;
+    }
+
+    private function resolvePropertySlug(array $data, ?Property $property = null): string
+    {
+        return $this->slugGenerator->generate($data, $property);
     }
 
     private function slugExists(string $modelClass, string $slug, ?int $ignoreId = null): bool

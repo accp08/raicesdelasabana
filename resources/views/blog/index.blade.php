@@ -7,8 +7,54 @@
 <link href="{{ asset('css/blog.css?id=1') }}" rel="stylesheet" />
 @endpush 
 
-@section('title', 'Blog inmobiliario | Raíces de la Sabana')
-@section('meta_description', 'Consejos, tendencias y guías del mercado inmobiliario en la Sabana de Bogotá. Aprende a comprar, vender o invertir mejor.')
+@php
+    $selectedCategory = $categories->firstWhere('id', (int) request('category'));
+    $blogPaginated = $posts->currentPage() > 1;
+    $blogHasFilters = request()->filled('category');
+    $blogCanonical = $blogPaginated ? $posts->url($posts->currentPage()) : route('blog.index');
+    $blogTitle = $selectedCategory
+        ? 'Blog inmobiliario de '.$selectedCategory->name.' | Raíces de la Sabana'
+        : 'Blog inmobiliario | Raíces de la Sabana';
+    $blogDescription = $selectedCategory
+        ? 'Consejos y guías inmobiliarias sobre '.$selectedCategory->name.' en la Sabana de Bogotá.'
+        : 'Consejos, tendencias y guías del mercado inmobiliario en la Sabana de Bogotá. Aprende a comprar, vender o invertir mejor.';
+    $blogBreadcrumbs = [
+        '@context' => 'https://schema.org',
+        '@type' => 'BreadcrumbList',
+        'itemListElement' => [
+            [
+                '@type' => 'ListItem',
+                'position' => 1,
+                'name' => 'Inicio',
+                'item' => url('/'),
+            ],
+            [
+                '@type' => 'ListItem',
+                'position' => 2,
+                'name' => 'Blog',
+                'item' => route('blog.index'),
+            ],
+        ],
+    ];
+@endphp
+
+@section('title', $blogTitle)
+@section('meta_description', $blogDescription)
+@section('canonical', $blogCanonical)
+@section('meta_robots', $blogHasFilters ? 'noindex,follow' : 'index,follow')
+
+@push('seo_links')
+    @if ($posts->previousPageUrl())
+<link rel="prev" href="{{ $posts->previousPageUrl() }}">
+    @endif
+    @if ($posts->nextPageUrl())
+<link rel="next" href="{{ $posts->nextPageUrl() }}">
+    @endif
+@endpush
+
+@push('structured_data')
+<script type="application/ld+json">{!! json_encode($blogBreadcrumbs, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
+@endpush
 
 @section('content')
 
@@ -45,7 +91,7 @@
                         : ($post->cover_image ? Storage::url($post->cover_image) : asset('img/banner-blog.webp'));
                 @endphp
                 <div class="card-blog">
-                    <img src="{{ $image }}" alt="{{ $post->title }}">
+                    <img src="{{ $image }}" alt="{{ $post->title }}" loading="lazy" decoding="async">
                     <div class="info-card-blog">
                         <h5>{{ $post->title }}</h5>
                         <p>{{ $post->excerpt ?? Str::limit(strip_tags($post->content), 140) }}</p>

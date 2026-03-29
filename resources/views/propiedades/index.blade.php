@@ -9,6 +9,7 @@
         || request()->filled('tipo')
         || filled(array_filter((array) request('property_type', [])));
     $isPaginated = $propiedades->currentPage() > 1;
+    $hasSeed = request()->filled('seed');
     $selectedCity = $ciudades->firstWhere('id', (int) request('city_id'));
     $selectedOffer = match (request('tipo')) {
         'venta' => 'en venta',
@@ -16,7 +17,9 @@
         default => 'disponibles',
     };
     $pageLabel = $isPaginated ? ' - Página '.$propiedades->currentPage() : '';
-    $canonicalUrl = $isPaginated ? $propiedades->url($propiedades->currentPage()) : route('propiedades.index');
+    $canonicalUrl = $isPaginated
+        ? route('propiedades.index', ['page' => $propiedades->currentPage()])
+        : route('propiedades.index');
     $seoTitle = 'Propiedades '.$selectedOffer;
     if ($selectedCity) {
         $seoTitle .= ' en '.$selectedCity->name;
@@ -37,19 +40,37 @@
 @section('title', $seoTitle)
 @section('meta_description', $seoDescription)
 @section('canonical', $canonicalUrl)
-@section('meta_robots', $hasFilters ? 'noindex,follow' : 'index,follow')
+@section('meta_robots', ($hasFilters || $hasSeed || $isPaginated) ? 'noindex,follow' : 'index,follow')
 
 @push('seo_links')
     @if ($propiedades->previousPageUrl())
-<link rel="prev" href="{{ $propiedades->previousPageUrl() }}">
+<link rel="prev" href="{{ route('propiedades.index', ['page' => $propiedades->currentPage() - 1]) }}">
     @endif
     @if ($propiedades->nextPageUrl())
-<link rel="next" href="{{ $propiedades->nextPageUrl() }}">
+<link rel="next" href="{{ route('propiedades.index', ['page' => $propiedades->currentPage() + 1]) }}">
     @endif
 @endpush
 
 @push('structured_data')
 @php
+    $breadcrumbs = [
+        '@context' => 'https://schema.org',
+        '@type' => 'BreadcrumbList',
+        'itemListElement' => [
+            [
+                '@type' => 'ListItem',
+                'position' => 1,
+                'name' => 'Inicio',
+                'item' => url('/'),
+            ],
+            [
+                '@type' => 'ListItem',
+                'position' => 2,
+                'name' => 'Propiedades',
+                'item' => route('propiedades.index'),
+            ],
+        ],
+    ];
     $itemList = [
         '@context' => 'https://schema.org',
         '@type' => 'CollectionPage',
@@ -70,6 +91,7 @@
         ],
     ];
 @endphp
+<script type="application/ld+json">{!! json_encode($breadcrumbs, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
 <script type="application/ld+json">{!! json_encode($itemList, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
 @endpush
 
@@ -84,6 +106,7 @@
             </button>
             <div class="collapse d-lg-block" id="filtersCollapse">
             <form action="" method="GET" class="filters-form">
+                <input type="hidden" name="seed" value="{{ $randomSeed }}">
                 <div class="filters-section">
                     <h5>Oferta</h5>
                     <div class="offer-toggle">

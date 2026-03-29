@@ -10,6 +10,7 @@ class PropiedadesController extends Controller
     public function index()
     {
         $query = Property::query()->where('status', 'published');
+        $seed = (int) request('seed', random_int(1000, 999999));
 
         if ($cityId = request('city_id')) {
             $query->where('city_id', $cityId);
@@ -31,13 +32,18 @@ class PropiedadesController extends Controller
             }
         }
 
+        $driver = DB::connection()->getDriverName();
+        if (in_array($driver, ['mysql', 'mariadb'], true)) {
+            $query->orderByRaw('RAND(?)', [$seed]);
+        } elseif ($driver === 'pgsql') {
+            $query->orderByRaw("md5(id::text || ?)", [(string) $seed]);
+        } else {
+            $query->orderByRaw('abs((id * 1103515245 + ?) % 2147483647)', [$seed]);
+        }
+
         $propiedades = $query->with('city')
-            ->orderByDesc('is_featured')
-            ->orderByDesc('published_at')
-            ->orderByDesc('updated_at')
-            ->orderByDesc('id')
             ->paginate(12)
-            ->withQueryString();
+            ->appends(array_merge(request()->query(), ['seed' => $seed]));
 
         $ciudades = \App\Models\City::query()
             ->where('is_active', true)
@@ -54,6 +60,7 @@ class PropiedadesController extends Controller
         return view('propiedades.index', [
             'propiedades' => $propiedades,
             'ciudades' => $ciudades,
+            'randomSeed' => $seed,
         ]);
     }
 

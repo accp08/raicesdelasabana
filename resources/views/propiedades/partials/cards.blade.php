@@ -17,7 +17,7 @@
     <div class="col-md-4">
         <div class="card shadow-sm h-100">
             <div class="position-relative">
-                <img src="{{ $image }}" class="card-img-top" alt="{{ $propiedad->titulo }}">
+                <img src="{{ $image }}" class="card-img-top" alt="{{ $propiedad->titulo }}" loading="lazy" decoding="async">
                 <span class="badge {{ $badgeClass }}">{{ $badgeLabel }}</span>
                 @if ($propiedad->is_featured)
                     <span class="badge badge-featured">⭐ Destacada</span>

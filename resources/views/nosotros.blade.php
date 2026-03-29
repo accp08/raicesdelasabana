@@ -23,7 +23,7 @@
         <p>Conoce el equipo y los valores que impulsan cada experiencia inmobiliaria.</p>
     </div>
     <div class="card-nosotros reveal">
-        <img src="{{ $about?->section1_image_thumb ? Storage::url($about->section1_image_thumb) : ($about?->section1_image ? Storage::url($about->section1_image) : url('/img/quienes-somos.webp')) }}" alt="">
+        <img src="{{ $about?->section1_image_thumb ? Storage::url($about->section1_image_thumb) : ($about?->section1_image ? Storage::url($about->section1_image) : url('/img/quienes-somos.webp')) }}" alt="{{ $about?->section1_title ?? 'Equipo de Raíces de la Sabana' }}" loading="lazy" decoding="async">
         <div class="info-nosotros">
             <h3>{{ $about?->section1_title ?? '¿Quiénes somos?' }}</h3>
             {!! nl2br(e($about?->section1_body ?? '')) !!}
@@ -31,7 +31,7 @@
     </div>
 
     <div class="card-nosotros reveal">
-        <img src="{{ $about?->section2_image_thumb ? Storage::url($about->section2_image_thumb) : ($about?->section2_image ? Storage::url($about->section2_image) : url('/img/lineas-de-negocio.webp')) }}" alt="">
+        <img src="{{ $about?->section2_image_thumb ? Storage::url($about->section2_image_thumb) : ($about?->section2_image ? Storage::url($about->section2_image) : url('/img/lineas-de-negocio.webp')) }}" alt="{{ $about?->section2_title ?? 'Líneas de negocio inmobiliario' }}" loading="lazy" decoding="async">
         <div class="info-nosotros">
             <h3>{{ $about?->section2_title ?? 'Líneas de negocio' }}</h3>
             {!! nl2br(e($about?->section2_body ?? '')) !!}
@@ -52,7 +52,7 @@
     </div>
 
     <div class="card-nosotros reveal">
-        <img src="{{ $about?->section3_image_thumb ? Storage::url($about->section3_image_thumb) : ($about?->section3_image ? Storage::url($about->section3_image) : url('/img/por-que-elegirnos.webp')) }}" alt="">
+        <img src="{{ $about?->section3_image_thumb ? Storage::url($about->section3_image_thumb) : ($about?->section3_image ? Storage::url($about->section3_image) : url('/img/por-que-elegirnos.webp')) }}" alt="{{ $about?->section3_title ?? 'Razones para elegir Raíces de la Sabana' }}" loading="lazy" decoding="async">
         <div class="info-nosotros">
             <h3>{{ $about?->section3_title ?? '¿Por qué elegirnos?' }}</h3>
             {!! nl2br(e($about?->section3_body ?? '')) !!}
@@ -73,7 +73,7 @@
     </div>
 
     <div class="card-nosotros reveal">
-        <img src="{{ $about?->section4_image_thumb ? Storage::url($about->section4_image_thumb) : ($about?->section4_image ? Storage::url($about->section4_image) : url('/img/lo-confirman.webp')) }}" alt="">
+        <img src="{{ $about?->section4_image_thumb ? Storage::url($about->section4_image_thumb) : ($about?->section4_image ? Storage::url($about->section4_image) : url('/img/lo-confirman.webp')) }}" alt="{{ $about?->section4_title ?? 'Testimonios de clientes' }}" loading="lazy" decoding="async">
         <div class="info-nosotros">
             <h3>{{ $about?->section4_title ?? 'Nuestros clientes lo confirman' }}</h3>
             {!! nl2br(e($about?->section4_body ?? '')) !!}
@@ -81,7 +81,7 @@
     </div>
 
     <div class="card-nosotros reveal">
-        <img src="{{ $about?->section5_image_thumb ? Storage::url($about->section5_image_thumb) : ($about?->section5_image ? Storage::url($about->section5_image) : url('/img/contactanos.webp')) }}" alt="">
+        <img src="{{ $about?->section5_image_thumb ? Storage::url($about->section5_image_thumb) : ($about?->section5_image ? Storage::url($about->section5_image) : url('/img/contactanos.webp')) }}" alt="{{ $about?->section5_title ?? 'Contacto inmobiliario' }}" loading="lazy" decoding="async">
         <div class="info-nosotros">
             <h3>{{ $about?->section5_title ?? 'Contáctanos' }}</h3>
             {!! nl2br(e($about?->section5_body ?? '')) !!}

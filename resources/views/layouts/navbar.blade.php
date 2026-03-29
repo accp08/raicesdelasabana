@@ -1,3 +1,7 @@
+@php
+    $navbarWhatsappMessage = 'Hola, quiero hablar con un asesor de Raíces de la Sabana.';
+    $navbarWhatsappHref = 'https://wa.me/573150597595?text=' . rawurlencode($navbarWhatsappMessage);
+@endphp
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm front-navbar">
     <div class="container">
         <a class="navbar-brand" href="{{ url('/') }}">
@@ -33,8 +37,8 @@
                 <a href="https://docs.google.com/forms/d/e/1FAIpQLSedXes7OzbtoVm81sHZifiyQNEAyTKquf4jW41lTvvHj3Cvjw/viewform?usp=publish-editor" target="_blank" rel="noopener noreferrer" class="btn btn-danger fw-bold shadow-sm navbar-consign">
                     Consigna tu inmueble
                 </a>
-                <a href="tel:+573150597595" class="btn btn-outline-danger fw-bold shadow-sm navbar-phone">
-                    📞 +57 315 059 7595
+                <a href="{{ $navbarWhatsappHref }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-danger fw-bold shadow-sm navbar-phone" aria-label="Hablar por WhatsApp con un asesor">
+                    WhatsApp asesor
                 </a>
             </div>
 
@@ -43,8 +47,8 @@
                 <a href="https://docs.google.com/forms/d/e/1FAIpQLSedXes7OzbtoVm81sHZifiyQNEAyTKquf4jW41lTvvHj3Cvjw/viewform?usp=publish-editor" target="_blank" rel="noopener noreferrer" class="btn btn-outline-danger fw-bold w-100 mb-2">
                     Consigna tu inmueble
                 </a>
-                <a href="tel:+573150597595" class="btn btn-danger fw-bold w-100">
-                    Llamar al +57 315 059 7595
+                <a href="{{ $navbarWhatsappHref }}" target="_blank" rel="noopener noreferrer" class="btn btn-danger fw-bold w-100" aria-label="Escribir por WhatsApp a Raíces de la Sabana">
+                    Escribir por WhatsApp
                 </a>
             </div>
         </div>
