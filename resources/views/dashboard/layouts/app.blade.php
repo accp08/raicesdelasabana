@@ -27,10 +27,10 @@
                 <a href="{{ route('dashboard.home') }}" class="{{ request()->routeIs('dashboard.home') ? 'active' : '' }}">
                     <span class="menu-icon">🏠</span> Inicio
                 </a>
-                <button class="sidebar-toggle {{ request()->routeIs('dashboard.properties.*') || request()->routeIs('dashboard.posts.*') || request()->routeIs('dashboard.leads.*') || request()->routeIs('dashboard.about.*') ? '' : 'collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#webSection" aria-expanded="{{ request()->routeIs('dashboard.properties.*') || request()->routeIs('dashboard.posts.*') || request()->routeIs('dashboard.leads.*') || request()->routeIs('dashboard.about.*') ? 'true' : 'false' }}" aria-controls="webSection">
+                <button class="sidebar-toggle {{ request()->routeIs('dashboard.properties.*') || request()->routeIs('dashboard.posts.*') || request()->routeIs('dashboard.leads.*') || request()->routeIs('dashboard.about.*') || request()->routeIs('dashboard.analytics.*') ? '' : 'collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#webSection" aria-expanded="{{ request()->routeIs('dashboard.properties.*') || request()->routeIs('dashboard.posts.*') || request()->routeIs('dashboard.leads.*') || request()->routeIs('dashboard.about.*') || request()->routeIs('dashboard.analytics.*') ? 'true' : 'false' }}" aria-controls="webSection">
                     <span class="menu-icon">🌐</span> Pagweb
                 </button>
-                <div class="collapse sidebar-subnav {{ request()->routeIs('dashboard.properties.*') || request()->routeIs('dashboard.posts.*') || request()->routeIs('dashboard.leads.*') || request()->routeIs('dashboard.about.*') ? 'show' : '' }}" id="webSection">
+                <div class="collapse sidebar-subnav {{ request()->routeIs('dashboard.properties.*') || request()->routeIs('dashboard.posts.*') || request()->routeIs('dashboard.leads.*') || request()->routeIs('dashboard.about.*') || request()->routeIs('dashboard.analytics.*') ? 'show' : '' }}" id="webSection">
                     @can('viewAny', App\Models\Property::class)
                         <a href="{{ route('dashboard.properties.index') }}" class="{{ request()->routeIs('dashboard.properties.*') ? 'active' : '' }}">
                             <span class="menu-icon">🏘️</span> Propiedades
@@ -46,6 +46,9 @@
                             <span class="menu-icon">📩</span> Contactos
                         </a>
                     @endcan
+                    <a href="{{ route('dashboard.analytics.index') }}" class="{{ request()->routeIs('dashboard.analytics.*') ? 'active' : '' }}">
+                        <span class="menu-icon">📊</span> Analítica
+                    </a>
                     @can('viewAny', App\Models\AboutPage::class)
                         <a href="{{ route('dashboard.about.edit') }}" class="{{ request()->routeIs('dashboard.about.*') ? 'active' : '' }}">
                             <span class="menu-icon">☎️</span> Contáctenos
@@ -113,12 +116,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const rentToggle = form.querySelector('input[name="for_rent"]');
         const salePrice = form.querySelector('input[name="sale_price"]');
         const rentPrice = form.querySelector('input[name="rent_price"]');
+        const saleCurrency = form.querySelector('select[name="sale_currency"]');
+        const rentCurrency = form.querySelector('select[name="rent_currency"]');
         const rentOnlyBlocks = form.querySelectorAll('[data-rent-only]');
         if (!saleToggle || !rentToggle || !salePrice || !rentPrice) return;
 
         const update = () => {
             salePrice.disabled = !saleToggle.checked;
             rentPrice.disabled = !rentToggle.checked;
+            if (saleCurrency) saleCurrency.disabled = !saleToggle.checked;
+            if (rentCurrency) rentCurrency.disabled = !rentToggle.checked;
             rentOnlyBlocks.forEach((block) => {
                 block.style.display = rentToggle.checked ? '' : 'none';
                 block.querySelectorAll('input, select, textarea').forEach((input) => {

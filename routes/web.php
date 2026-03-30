@@ -17,6 +17,8 @@ use App\Http\Controllers\PropertyLeadController;
 use App\Http\Controllers\Dashboard\CitiesController;
 use App\Http\Controllers\Dashboard\CategoriesController;
 use App\Http\Controllers\SitemapController;
+use App\Http\Controllers\AnalyticsEventController;
+use App\Http\Controllers\Dashboard\AnalyticsController;
 
 Route::get('/', [HomeController::class, 'index']);
 Route::get('/interna', [InternaController::class, 'index']);
@@ -24,12 +26,16 @@ Route::get('/nosotros', [NosotrosController::class, 'index']);
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/interna', [BlogController::class, 'interna']);
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
+Route::redirect('/propieades', '/propiedades', 301);
 Route::get('/propiedades', [PropiedadesController::class, 'index'])->name('propiedades.index');
 Route::get('/propiedades/{slug}', [PropiedadesController::class, 'show'])->name('propiedades.show');
 Route::post('/propiedades/{slug}/contacto', [PropertyLeadController::class, 'store'])
     ->name('propiedades.contact')
     ->middleware('throttle:5,1');
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+Route::post('/analytics/events', [AnalyticsEventController::class, 'store'])
+    ->name('analytics.events.store')
+    ->middleware('throttle:240,1');
 Route::get('/storage/{path}', [HomeController::class, 'verImagen'])
     ->where('path', '.*')
     ->name('storage.fallback');
@@ -46,6 +52,7 @@ Route::prefix('dashboard')->name('dashboard.')->group(function () {
         Route::resource('users', UsersController::class)->except(['show']);
         Route::resource('properties', PropertiesController::class)->except(['show']);
         Route::resource('posts', PostsController::class)->except(['show']);
+        Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
         Route::get('/about', [AboutController::class, 'edit'])->name('about.edit');
         Route::put('/about', [AboutController::class, 'update'])->name('about.update');
         Route::resource('leads', PropertyLeadsController::class)->only(['index', 'show', 'update', 'destroy']);

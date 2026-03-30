@@ -69,17 +69,33 @@
                                 </div>
                                 @error('for_sale')<small class="text-danger">{{ $message }}</small>@enderror
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label class="form-label">Precio de venta</label>
                                 <input type="number" step="0.01" name="sale_price" class="form-control" value="{{ old('sale_price', $property->sale_price) }}">
                                 @error('sale_price')<small class="text-danger">{{ $message }}</small>@enderror
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-2">
+                                <label class="form-label">Moneda venta</label>
+                                <select name="sale_currency" class="form-select">
+                                    <option value="COP" {{ old('sale_currency', $property->sale_currency ?? 'COP') === 'COP' ? 'selected' : '' }}>COP</option>
+                                    <option value="USD" {{ old('sale_currency', $property->sale_currency) === 'USD' ? 'selected' : '' }}>USD</option>
+                                </select>
+                                @error('sale_currency')<small class="text-danger">{{ $message }}</small>@enderror
+                            </div>
+                            <div class="col-md-3">
                                 <label class="form-label">Precio de arriendo</label>
                                 <input type="number" step="0.01" name="rent_price" class="form-control" value="{{ old('rent_price', $property->rent_price) }}">
                                 @error('rent_price')<small class="text-danger">{{ $message }}</small>@enderror
                             </div>
-                            <div class="col-md-4" data-rent-only>
+                            <div class="col-md-2">
+                                <label class="form-label">Moneda arriendo</label>
+                                <select name="rent_currency" class="form-select">
+                                    <option value="COP" {{ old('rent_currency', $property->rent_currency ?? 'COP') === 'COP' ? 'selected' : '' }}>COP</option>
+                                    <option value="USD" {{ old('rent_currency', $property->rent_currency) === 'USD' ? 'selected' : '' }}>USD</option>
+                                </select>
+                                @error('rent_currency')<small class="text-danger">{{ $message }}</small>@enderror
+                            </div>
+                            <div class="col-md-2" data-rent-only>
                                 <label class="form-label">Administración incluida</label>
                                 <select name="administracion_incluida" class="form-select">
                                     <option value="">Seleccionar</option>

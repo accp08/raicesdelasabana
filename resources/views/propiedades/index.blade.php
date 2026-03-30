@@ -4,6 +4,10 @@
 <link href="{{ asset('css/propiedades.css?id=1') }}" rel="stylesheet" />
 @endpush 
 
+@push('seo_links')
+<link rel="preload" as="image" href="{{ asset('img/banner-propiedades.jpeg') }}" fetchpriority="high">
+@endpush
+
 @php
     $hasFilters = request()->filled('city_id')
         || request()->filled('tipo')
@@ -41,6 +45,9 @@
 @section('meta_description', $seoDescription)
 @section('canonical', $canonicalUrl)
 @section('meta_robots', ($hasFilters || $hasSeed || $isPaginated) ? 'noindex,follow' : 'index,follow')
+@section('whatsapp_link', 'https://wa.me/573150597595?text='.rawurlencode('Hola, quiero ayuda para encontrar un inmueble en la Sabana de Bogotá. Estoy viendo el listado de propiedades: '.route('propiedades.index')))
+@section('whatsapp_title', 'Quiero ayuda para encontrar mi inmueble')
+@section('whatsapp_subtitle', 'Te ayudamos a filtrar por ciudad, tipo de negocio y presupuesto para enviarte opciones por WhatsApp.')
 
 @push('seo_links')
     @if ($propiedades->previousPageUrl())
@@ -108,7 +115,7 @@
             <form action="" method="GET" class="filters-form">
                 <input type="hidden" name="seed" value="{{ $randomSeed }}">
                 <div class="filters-section">
-                    <h5>Oferta</h5>
+                    <p class="filters-title">Oferta</p>
                     <div class="offer-toggle">
                         <label class="offer-card">
                             <input type="radio" name="tipo" value="arriendo" {{ request('tipo') === 'arriendo' ? 'checked' : '' }}>
@@ -124,8 +131,8 @@
                 </div>
 
                 <div class="content-input">
-                    <label for="">Ciudad</label>
-                    <select name="city_id" class="form-select">
+                    <label for="propiedades-city">Ciudad</label>
+                    <select id="propiedades-city" name="city_id" class="form-select">
                         <option value="">- Seleccionar -</option>
                     @foreach ($ciudades as $ciudad)
                         <option value="{{ $ciudad->id }}" {{ request('city_id') == $ciudad->id ? 'selected' : '' }}>
@@ -136,7 +143,7 @@
             </div>
 
                 <div class="content-input">
-                    <label for="">Tipo de inmueble</label>
+                    <span class="content-label">Tipo de inmueble</span>
                     <div class="type-list">
                         @php
                             $types = [
@@ -185,6 +192,13 @@
             <div class="mb-4">
                 <h1 class="h3 fw-bold">Propiedades disponibles</h1>
                 <p class="text-muted">Filtra por ciudad y tipo para encontrar la opción ideal.</p>
+                <div class="listing-cta-card">
+                    <div>
+                        <strong>¿Prefieres que te enviemos opciones por WhatsApp?</strong>
+                        <p>Cuéntanos qué ciudad, presupuesto y tipo de inmueble buscas, y te compartimos alternativas más rápido.</p>
+                    </div>
+                    <a href="@yield('whatsapp_link')" target="_blank" rel="noopener noreferrer" class="btn btn-danger">Recibir opciones por WhatsApp</a>
+                </div>
             </div>
 
             <div id="content-cards-propiedades">

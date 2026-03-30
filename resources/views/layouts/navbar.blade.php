@@ -5,7 +5,7 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm front-navbar">
     <div class="container">
         <a class="navbar-brand" href="{{ url('/') }}">
-            <img src="{{ asset('img/logo.png') }}" alt="Logo Raíces de la Sabana" class="logo-central">
+            <img src="{{ asset('img/logo.png') }}" alt="Logo Raíces de la Sabana" class="logo-central" fetchpriority="high">
         </a>
 
         {{-- Botón hamburguesa móvil --}}

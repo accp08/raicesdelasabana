@@ -28,11 +28,17 @@ class PropertySlugGenerator
             $data['ciudad'] ?? null
         );
 
+        $propertyType = $this->normalizeLabel((string) ($data['property_type'] ?? ''));
+        $operation = $this->tipoKeyword($data['tipo'] ?? null);
+        $city = $this->normalizeLabel((string) ($data['ciudad'] ?? ''));
+        $barrio = $this->normalizeLabel((string) ($data['barrio'] ?? ''));
+        $titleContext = $this->compactTitleContext($title, $propertyType, $operation, $city, $barrio);
+        $location = $barrio !== '' ? $barrio : $titleContext;
+
         $segments = [
-            $data['property_type'] ?? null,
-            $this->tipoLabel($data['tipo'] ?? null),
-            $title,
-            $data['barrio'] ?? null,
+            $propertyType,
+            $operation,
+            $location,
         ];
 
         return $this->normalizeSegments($segments)->implode(' ');
@@ -46,7 +52,7 @@ class PropertySlugGenerator
         return $this->normalizeSegments([
             $descriptiveBase,
             $city,
-            $code,
+            $code !== '' ? Str::lower($code) : null,
         ])->implode(' ');
     }
 
@@ -74,6 +80,16 @@ class PropertySlugGenerator
         };
     }
 
+    public function tipoKeyword(?string $tipo): ?string
+    {
+        return match ($tipo) {
+            'venta' => 'venta',
+            'arriendo' => 'arriendo',
+            'mixto' => 'mixto',
+            default => null,
+        };
+    }
+
     private function slugExists(string $slug, ?int $ignoreId = null): bool
     {
         return Property::withTrashed()
@@ -94,6 +110,14 @@ class PropertySlugGenerator
             ->filter()
             ->unique()
             ->values();
+    }
+
+    private function normalizeLabel(string $value): string
+    {
+        $value = Str::lower(trim($value));
+        $value = preg_replace('/\s+/', ' ', $value) ?? $value;
+
+        return trim($value);
     }
 
     private function sanitizeTitle(string $title, ?string $propertyType, ?string $tipo, ?string $city): string
@@ -118,6 +142,52 @@ class PropertySlugGenerator
         }
 
         return trim(preg_replace('/\s+/', ' ', $clean) ?? $clean);
+    }
+
+    private function compactTitleContext(
+        string $title,
+        string $propertyType,
+        ?string $operation,
+        string $city,
+        string $barrio
+    ): ?string {
+        $title = $this->normalizeLabel($title);
+
+        if ($title === '') {
+            return null;
+        }
+
+        $stopWords = [
+            'de', 'del', 'la', 'las', 'el', 'los', 'y', 'en', 'para', 'por', 'con', 'un', 'una',
+            'apartamento', 'casa', 'lote', 'casa lote', 'oficina', 'bodega', 'finca',
+            'venta', 'arriendo', 'mixto',
+        ];
+
+        $tokens = collect(explode(' ', $title))
+            ->map(fn ($token) => trim($token))
+            ->filter()
+            ->reject(function ($token) use ($stopWords, $propertyType, $operation, $city, $barrio) {
+                if (in_array($token, $stopWords, true)) {
+                    return true;
+                }
+
+                foreach ([$propertyType, $operation ?? '', $city, $barrio] as $blocked) {
+                    if ($blocked !== '' && str_contains($blocked, $token)) {
+                        return true;
+                    }
+                }
+
+                return false;
+            })
+            ->unique()
+            ->take(4)
+            ->values();
+
+        if ($tokens->isEmpty()) {
+            return null;
+        }
+
+        return $tokens->implode(' ');
     }
 
     private function tipoLabelPattern(?string $tipo): string

@@ -36,7 +36,9 @@ class PropertyUpdateRequest extends FormRequest
             'for_sale' => ['nullable', 'boolean'],
             'for_rent' => ['nullable', 'boolean'],
             'sale_price' => ['nullable', 'numeric', 'min:0', 'required_if:for_sale,1'],
+            'sale_currency' => ['nullable', 'string', 'in:COP,USD', 'required_if:for_sale,1'],
             'rent_price' => ['nullable', 'numeric', 'min:0', 'required_if:for_rent,1'],
+            'rent_currency' => ['nullable', 'string', 'in:COP,USD', 'required_if:for_rent,1'],
             'administracion_incluida' => ['required_if:for_rent,1', 'boolean'],
             'estado' => ['required', 'in:disponible,no_disponible'],
             'habitaciones' => ['nullable', 'integer', 'min:0', 'max:50'],
@@ -78,7 +80,9 @@ class PropertyUpdateRequest extends FormRequest
     {
         return [
             'sale_price.required_if' => 'El precio de venta es obligatorio cuando seleccionas venta.',
+            'sale_currency.required_if' => 'La moneda de venta es obligatoria cuando seleccionas venta.',
             'rent_price.required_if' => 'El precio de arriendo es obligatorio cuando seleccionas arriendo.',
+            'rent_currency.required_if' => 'La moneda de arriendo es obligatoria cuando seleccionas arriendo.',
             'administracion_incluida.required_if' => 'Debes indicar si la administración está incluida cuando seleccionas arriendo.',
         ];
     }
@@ -87,7 +91,9 @@ class PropertyUpdateRequest extends FormRequest
     {
         return [
             'sale_price' => 'precio de venta',
+            'sale_currency' => 'moneda de venta',
             'rent_price' => 'precio de arriendo',
+            'rent_currency' => 'moneda de arriendo',
         ];
     }
 }

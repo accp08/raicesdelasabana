@@ -31,7 +31,9 @@ class Property extends Model
         'for_sale',
         'for_rent',
         'sale_price',
+        'sale_currency',
         'rent_price',
+        'rent_currency',
         'administracion_incluida',
         'estado',
         'habitaciones',
@@ -72,6 +74,18 @@ class Property extends Model
         'administracion_incluida' => 'boolean',
         'is_featured' => 'boolean',
     ];
+
+    public function formatMoney(?float $amount, ?string $currency = 'COP'): ?string
+    {
+        if ($amount === null) {
+            return null;
+        }
+
+        $currency = in_array($currency, ['COP', 'USD'], true) ? $currency : 'COP';
+        $prefix = $currency === 'USD' ? 'USD ' : '$';
+
+        return $prefix.number_format($amount, 0, ',', '.');
+    }
 
     public function creator()
     {

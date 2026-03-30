@@ -13,6 +13,9 @@
 @section('meta_description', 'Conoce a Raíces de la Sabana: experiencia inmobiliaria, acompañamiento experto y servicios integrales en la Sabana de Bogotá.')
 @section('meta_og_image', $heroImage)
 @section('meta_twitter_image', $heroImage)
+@section('whatsapp_link', 'https://wa.me/573150597595?text='.rawurlencode('Hola, quiero conocer mejor el servicio de Raíces de la Sabana y hablar con un asesor.'))
+@section('whatsapp_title', 'Hablar con Raíces de la Sabana por WhatsApp')
+@section('whatsapp_subtitle', 'Te contamos cómo trabajamos y te ayudamos a encontrar o consignar tu inmueble con acompañamiento directo.')
 
 @section('content')
 
@@ -98,6 +101,10 @@
             @if ($about?->contact_email)
                 <a class="btn-contacto-nosotros" href="mailto:{{ $about->contact_email }}"><b>Email:</b> {{ $about->contact_email }}</a>
             @endif
+            <div class="card-cta-stack mt-3">
+                <a href="@yield('whatsapp_link')" target="_blank" rel="noopener noreferrer" class="btn btn-danger">Escribir por WhatsApp</a>
+                <a href="{{ route('propiedades.index') }}" class="btn btn-outline-danger">Ver inmuebles disponibles</a>
+            </div>
         </div>
     </div>
 </section>

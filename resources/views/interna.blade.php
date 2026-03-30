@@ -16,6 +16,15 @@
 @php
     $propertyReference = $property->property_code ?: strtoupper($property->slug);
     $whatsappMessage = "Hola, estoy interesado en este inmueble: {$property->titulo}. Referencia: {$propertyReference}. Link: " . url()->current();
+    $whatsappVisitMessage = "Hola, quiero agendar una visita para el inmueble {$property->titulo}. Referencia: {$propertyReference}. Link: " . url()->current();
+    $whatsappAvailabilityMessage = "Hola, quiero confirmar disponibilidad del inmueble {$property->titulo}. Referencia: {$propertyReference}. Link: " . url()->current();
+    $whatsappLocationMessage = "Hola, quiero recibir la ubicación del inmueble {$property->titulo}. Referencia: {$propertyReference}. Link: " . url()->current();
+    $whatsappSimilarMessage = "Hola, quiero opciones similares al inmueble {$property->titulo}. Referencia: {$propertyReference}. Link: " . url()->current();
+    $whatsappGeneralLink = 'https://wa.me/573150597595?text=' . rawurlencode($whatsappMessage);
+    $whatsappVisitLink = 'https://wa.me/573150597595?text=' . rawurlencode($whatsappVisitMessage);
+    $whatsappAvailabilityLink = 'https://wa.me/573150597595?text=' . rawurlencode($whatsappAvailabilityMessage);
+    $whatsappLocationLink = 'https://wa.me/573150597595?text=' . rawurlencode($whatsappLocationMessage);
+    $whatsappSimilarLink = 'https://wa.me/573150597595?text=' . rawurlencode($whatsappSimilarMessage);
     $propertyImages = collect([$property->imagen_principal, ...($property->galeria ?? [])])
         ->filter()
         ->map(fn ($image) => Storage::url($image))
@@ -27,7 +36,7 @@
         : (($property->for_rent && $property->rent_price) ? (float) $property->rent_price : (float) ($property->precio ?? 0));
     $propertyBusinessType = $property->for_sale ? 'https://schema.org/SellAction' : 'https://schema.org/RentAction';
 @endphp
-@section('whatsapp_link', 'https://wa.me/573150597595?text=' . rawurlencode($whatsappMessage))
+@section('whatsapp_link', $whatsappGeneralLink)
 @section('whatsapp_title', 'Consultar este inmueble por WhatsApp')
 
 @push('structured_data')
@@ -92,6 +101,12 @@
             'businessFunction' => $propertyBusinessType,
             'url' => route('propiedades.show', $property->slug),
         ] : null,
+        'seller' => [
+            '@type' => 'RealEstateAgent',
+            'name' => 'Raíces de la Sabana',
+            'url' => config('app.url'),
+            'telephone' => '+57 3150597595',
+        ],
     ];
 
     $realEstateSchema = array_filter($realEstateSchema, fn ($value) => !is_null($value) && $value !== []);
@@ -119,14 +134,21 @@
             </div>
             <div class="property-price">
                 @if ($property->for_sale && $property->sale_price)
-                    <div><strong>Venta:</strong> ${{ number_format($property->sale_price, 0, ',', '.') }}</div>
+                    <div><strong>Venta:</strong> {{ $property->formatMoney((float) $property->sale_price, $property->sale_currency) }}</div>
                 @endif
                 @if ($property->for_rent && $property->rent_price)
-                    <div><strong>Arriendo:</strong> ${{ number_format($property->rent_price, 0, ',', '.') }}</div>
+                    <div><strong>Arriendo:</strong> {{ $property->formatMoney((float) $property->rent_price, $property->rent_currency) }}</div>
                 @endif
                 @if (! $property->for_sale && ! $property->for_rent)
-                    {{ $property->precio ? '$'.number_format($property->precio, 0, ',', '.') : 'Precio bajo consulta' }}
+                    {{ $property->precio ? $property->formatMoney((float) $property->precio, 'COP') : 'Precio bajo consulta' }}
                 @endif
+            </div>
+            <div class="property-cta-top">
+                <a href="{{ $whatsappGeneralLink }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-danger property-whatsapp-btn property-whatsapp-btn--main">Consultar por WhatsApp</a>
+            </div>
+            <div class="property-trust-strip">
+                <span>Respuesta rápida por WhatsApp</span>
+                <span>Asesoría sin costo</span>
             </div>
         </div>
 
@@ -178,6 +200,11 @@
             @else
                 <p>Información en construcción.</p>
             @endif
+
+            <div class="property-quick-actions">
+                <a href="{{ $whatsappLocationLink }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-danger">Solicitar ubicación</a>
+                <a href="{{ $whatsappSimilarLink }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-danger">Ver opciones similares</a>
+            </div>
 
             <div class="content-items-interna dos-items property-features">
                 @if ($property->for_sale || $property->for_rent)
@@ -298,38 +325,19 @@
 
     <aside class="property-aside">
         <div class="contact-card">
-            <h3>Agenda una visita</h3>
-            <p>Déjanos tus datos y un asesor te contactará pronto.</p>
-            <a href="@yield('whatsapp_link')" target="_blank" rel="noopener noreferrer" class="btn btn-outline-danger w-100 mb-3">
+            <h3>Habla con un asesor</h3>
+            <p>Resolvemos disponibilidad, ubicación y opciones similares por WhatsApp.</p>
+            <div class="contact-trust-box">
+                <strong>Te respondemos por WhatsApp en minutos</strong>
+                <span>Recibe disponibilidad, ubicación y condiciones del inmueble.</span>
+            </div>
+            <a href="{{ $whatsappGeneralLink }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-danger property-whatsapp-btn w-100 mb-2">
                 Consultar por WhatsApp
             </a>
-            @if (session('status'))
-                <div class="alert alert-success">{{ session('status') }}</div>
-            @endif
-            <form method="POST" action="{{ route('propiedades.contact', $property->slug) }}">
-                @csrf
-                <div class="mb-3">
-                    <label class="form-label">Nombre</label>
-                    <input type="text" name="name" class="form-control" required>
-                    @error('name')<small class="text-danger">{{ $message }}</small>@enderror
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Email</label>
-                    <input type="email" name="email" class="form-control" required>
-                    @error('email')<small class="text-danger">{{ $message }}</small>@enderror
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Teléfono</label>
-                    <input type="text" name="phone" class="form-control">
-                    @error('phone')<small class="text-danger">{{ $message }}</small>@enderror
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Mensaje</label>
-                    <textarea name="message" class="form-control" rows="3"></textarea>
-                    @error('message')<small class="text-danger">{{ $message }}</small>@enderror
-                </div>
-                <button class="btn btn-danger w-100" type="submit">Enviar solicitud</button>
-            </form>
+            <div class="contact-quick-links">
+                <a href="{{ $whatsappVisitLink }}" target="_blank" rel="noopener noreferrer">Agendar visita</a>
+                <a href="{{ $whatsappLocationLink }}" target="_blank" rel="noopener noreferrer">Pedir ubicación</a>
+            </div>
         </div>
     </aside>
 </section>

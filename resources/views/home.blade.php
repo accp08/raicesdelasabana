@@ -1,9 +1,16 @@
 @extends('layouts.app')
 
-@section('title', 'Raíces de la Sabana | Compra, venta y arriendo en la Sabana de Bogotá')
+@section('title', 'Inmobiliaria en la Sabana de Bogotá | Raíces de la Sabana')
 @section('meta_description', 'Inmuebles en la Sabana de Bogotá. Compra, venta y arriendo con asesoría experta, visitas guiadas y acompañamiento legal.')
 @section('meta_og_image', asset('img/fondo-campo.jpg'))
 @section('meta_twitter_image', asset('img/fondo-campo.jpg'))
+@section('whatsapp_link', $homeWhatsappHref ?? 'https://wa.me/573150597595?text=Hola%2C%20quiero%20informaci%C3%B3n%20sobre%20inmuebles%20disponibles%20en%20la%20Sabana%20de%20Bogot%C3%A1.')
+@section('whatsapp_title', 'Hablar con un asesor por WhatsApp')
+@section('whatsapp_subtitle', 'Cuéntanos qué ciudad, presupuesto y tipo de inmueble buscas y te compartimos opciones reales.')
+
+@push('seo_links')
+<link rel="preload" as="image" href="{{ asset('img/fondo-campo.jpg') }}" fetchpriority="high">
+@endpush
 
 @push('structured_data')
 @php
@@ -31,6 +38,14 @@
         'name' => 'Raíces de la Sabana',
         'url' => config('app.url'),
         'inLanguage' => 'es-CO',
+        'potentialAction' => [
+            '@type' => 'SearchAction',
+            'target' => route('propiedades.index') . '?city_id={city_id}&tipo={tipo}',
+            'query-input' => [
+                'required name=city_id',
+                'required name=tipo',
+            ],
+        ],
         'publisher' => [
             '@type' => 'Organization',
             'name' => 'Raíces de la Sabana',
@@ -59,19 +74,21 @@
 
             <div class="search-panel">
                 <div class="search-panel__head">
-                    <h5>Busca tu propiedad</h5>
+                    <h2 class="search-panel__title">Busca tu propiedad</h2>
                     <span>Filtra rápido y compara opciones</span>
                 </div>
                 <form class="row g-2 align-items-center" method="GET" action="{{ route('propiedades.index') }}">
                     <div class="col-md-4">
-                        <select class="form-select" name="tipo">
+                        <label class="visually-hidden" for="home-search-tipo">Tipo de negocio</label>
+                        <select class="form-select" id="home-search-tipo" name="tipo">
                             <option value="">¿Venta o Arriendo?</option>
                             <option value="venta">Venta</option>
                             <option value="arriendo">Arriendo</option>
                         </select>
                     </div>
                     <div class="col-md-5">
-                        <select class="form-select" name="city_id">
+                        <label class="visually-hidden" for="home-search-city">Ciudad</label>
+                        <select class="form-select" id="home-search-city" name="city_id">
                             <option value="">Selecciona una ciudad</option>
                             @foreach ($ciudades as $ciudad)
                                 <option value="{{ $ciudad->id }}">{{ $ciudad->name }}</option>
@@ -94,7 +111,7 @@
 </section>
 
 <!-- Propiedades destacadas -->
-<section class="container py-5">
+<section class="container py-5 defer-section">
     <div class="section-head text-center">
         <h2 class="section-title">Propiedades Destacadas</h2>
         <p class="section-subtitle">Opciones premium seleccionadas por nuestro equipo.</p>
@@ -121,7 +138,7 @@
                 <div class="col-md-4">
                     <div class="card shadow-sm h-100 card-property">
                         <div class="position-relative">
-                            <img src="{{ $image }}" class="card-img-top" alt="{{ $propiedad->titulo }}" loading="lazy" decoding="async">
+                            <img src="{{ $image }}" class="card-img-top" alt="{{ $propiedad->titulo }}" width="640" height="360" loading="lazy" decoding="async">
                             <span class="badge {{ $badgeClass }}">{{ $badgeLabel }}</span>
                             @if ($propiedad->is_featured)
                                 <span class="badge badge-featured">⭐ Destacada</span>
@@ -135,16 +152,23 @@
                             @endif
                             <p class="text-danger fw-bold">
                                 @if ($propiedad->for_sale && $propiedad->sale_price)
-                                    Venta: ${{ number_format($propiedad->sale_price, 0, ',', '.') }}
+                                    Venta: {{ $propiedad->formatMoney((float) $propiedad->sale_price, $propiedad->sale_currency) }}
                                 @endif
                                 @if ($propiedad->for_rent && $propiedad->rent_price)
-                                    <span class="d-block">Arriendo: ${{ number_format($propiedad->rent_price, 0, ',', '.') }}</span>
+                                    <span class="d-block">Arriendo: {{ $propiedad->formatMoney((float) $propiedad->rent_price, $propiedad->rent_currency) }}</span>
                                 @endif
                                 @if (! $propiedad->for_sale && ! $propiedad->for_rent)
-                                    {{ $propiedad->precio ? '$'.number_format($propiedad->precio, 0, ',', '.') : 'Precio bajo consulta' }}
+                                    {{ $propiedad->precio ? $propiedad->formatMoney((float) $propiedad->precio, 'COP') : 'Precio bajo consulta' }}
                                 @endif
                             </p>
-                            <a href="{{ route('propiedades.show', $propiedad->slug) }}" class="btn btn-outline-danger w-100">Ver detalles</a>
+                            @php
+                                $cardWhatsappMessage = "Hola, quiero información sobre el inmueble {$propiedad->titulo} en ".($propiedad->city?->name ?? $propiedad->ciudad).". Link: ".route('propiedades.show', $propiedad->slug);
+                                $cardWhatsappHref = 'https://wa.me/573150597595?text=' . rawurlencode($cardWhatsappMessage);
+                            @endphp
+                            <div class="card-cta-stack">
+                                <a href="{{ route('propiedades.show', $propiedad->slug) }}" class="btn btn-outline-danger w-100">Ver detalles</a>
+                                <a href="{{ $cardWhatsappHref }}" target="_blank" rel="noopener noreferrer" class="btn btn-danger w-100">Consultar por WhatsApp</a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -164,7 +188,7 @@
 </section>
 
 <!-- Beneficios -->
-<section class="section-soft">
+<section class="section-soft defer-section">
     <div class="container">
         <div class="section-head text-center">
             <h2 class="section-title">Tu compra o arriendo, sin fricciones</h2>
@@ -194,17 +218,36 @@
 </section>
 
 <!-- CTA final -->
-<section class="cta-band">
+<section class="cta-band defer-section">
     <div class="container">
         <div class="cta-card">
             <div>
-                <h3>¿Listo para agendar una visita?</h3>
+                <h2>¿Listo para agendar una visita?</h2>
                 <p>Agenda hoy y recibe una propuesta personalizada con opciones que sí encajan contigo.</p>
             </div>
             <div class="cta-actions">
                 <a href="{{ $homeWhatsappHref }}" target="_blank" rel="noopener noreferrer" class="btn btn-light">Escribir por WhatsApp</a>
-                <a href="tel:+573150597595" class="btn btn-outline-light">Llamar ahora</a>
+                <a href="{{ url('/propiedades') }}" class="btn btn-outline-light">Ver inmuebles disponibles</a>
             </div>
+        </div>
+    </div>
+</section>
+
+<section class="container py-5 defer-section">
+    <div class="section-head text-center">
+        <h2 class="section-title">Compra, arriendo e inversión inmobiliaria en la Sabana de Bogotá</h2>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <p class="lead text-center mb-4">
+                En Raíces de la Sabana ayudamos a personas, familias e inversionistas a encontrar inmuebles bien ubicados, con información clara y acompañamiento experto en cada etapa del proceso.
+            </p>
+            <p>
+                Nuestro portafolio incluye casas, apartamentos, lotes, fincas, oficinas y bodegas en zonas de alta demanda como Chía, Cajicá, Zipaquirá, Bogotá y otros municipios de la Sabana. Si quieres vivir con mejor calidad de vida, mudarte cerca de Bogotá o invertir en una propiedad con potencial de valorización, te orientamos con opciones reales y actualizadas.
+            </p>
+            <p>
+                Además de mostrar inmuebles disponibles para compra y arriendo, te acompañamos en visitas, negociación, validación comercial y toma de decisión. Nuestro objetivo es que encuentres tu lugar ideal para vivir o invertir con un proceso más claro, confiable y rápido. Si prefieres una atención directa, puedes escribirnos por WhatsApp y uno de nuestros asesores te ayudará a filtrar propiedades según ciudad, presupuesto y tipo de inmueble.
+            </p>
         </div>
     </div>
 </section>

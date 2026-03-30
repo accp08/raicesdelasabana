@@ -42,6 +42,9 @@
 @section('meta_description', $blogDescription)
 @section('canonical', $blogCanonical)
 @section('meta_robots', $blogHasFilters ? 'noindex,follow' : 'index,follow')
+@section('whatsapp_link', 'https://wa.me/573150597595?text='.rawurlencode('Hola, estoy leyendo el blog de Raíces de la Sabana y quiero hablar con un asesor sobre una compra, arriendo o inversión inmobiliaria.'))
+@section('whatsapp_title', 'Resolver mi duda por WhatsApp')
+@section('whatsapp_subtitle', 'Si un artículo te interesó, te ayudamos a convertir esa información en una búsqueda o decisión real.')
 
 @push('seo_links')
     @if ($posts->previousPageUrl())
@@ -63,6 +66,13 @@
     <div class="mb-3">
         <h1 class="h3 fw-bold">Blog inmobiliario</h1>
         <p class="text-muted">Ideas, análisis y recomendaciones para tomar mejores decisiones inmobiliarias.</p>
+        <div class="listing-cta-card">
+            <div>
+                <strong>¿Quieres aterrizar esta información a tu caso?</strong>
+                <p>Escríbenos por WhatsApp y te ayudamos a revisar zonas, presupuesto e inmuebles según tu objetivo.</p>
+            </div>
+            <a href="@yield('whatsapp_link')" target="_blank" rel="noopener noreferrer" class="btn btn-danger">Hablar con un asesor</a>
+        </div>
     </div>
     <form class="row g-2 justify-content-end" method="GET">
         <div class="col-md-4">
@@ -95,7 +105,14 @@
                     <div class="info-card-blog">
                         <h5>{{ $post->title }}</h5>
                         <p>{{ $post->excerpt ?? Str::limit(strip_tags($post->content), 140) }}</p>
-                        <a class="btn btn-outline-danger w-100" href="{{ route('blog.show', $post->slug) }}" class="btn btn-ver-blog">Ver Más</a>
+                        @php
+                            $blogWhatsappMessage = "Hola, estoy leyendo este artículo: {$post->title}. Quiero orientación sobre inmuebles o inversión. Link: ".route('blog.show', $post->slug);
+                            $blogWhatsappHref = 'https://wa.me/573150597595?text=' . rawurlencode($blogWhatsappMessage);
+                        @endphp
+                        <div class="card-cta-stack">
+                            <a class="btn btn-outline-danger w-100" href="{{ route('blog.show', $post->slug) }}">Ver Más</a>
+                            <a class="btn btn-danger w-100" href="{{ $blogWhatsappHref }}" target="_blank" rel="noopener noreferrer">Hablar por WhatsApp</a>
+                        </div>
                     </div>
                 </div>
             @endforeach

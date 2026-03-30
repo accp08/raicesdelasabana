@@ -54,14 +54,11 @@ class PropertiesController extends Controller
     public function store(PropertyStoreRequest $request)
     {
         $data = $request->validated();
+        $data = $this->normalizePropertyData($request, $data);
         $data['property_code'] = $this->generateUniqueCode();
         $data['created_by'] = $request->user()->id;
         $data['updated_by'] = $request->user()->id;
-        $data['tipo'] = $this->resolveTipo($data['for_sale'] ?? false, $data['for_rent'] ?? false);
-        $data['is_featured'] = $request->boolean('is_featured');
-        $data['administracion_incluida'] = $request->boolean('for_rent')
-            ? $request->boolean('administracion_incluida')
-            : null;
+        $data['tipo'] = $this->resolveTipo($data['for_sale'], $data['for_rent']);
         $data['ciudad'] = \App\Models\City::find($data['city_id'])->name ?? $data['ciudad'] ?? '';
         $data['slug'] = $this->resolvePropertySlug($data, null);
 
@@ -111,17 +108,14 @@ class PropertiesController extends Controller
     public function update(PropertyUpdateRequest $request, Property $property)
     {
         $data = $request->validated();
+        $data = $this->normalizePropertyData($request, $data);
         $propertyCode = $property->property_code;
         if (empty($propertyCode)) {
             $propertyCode = $this->generateUniqueCode();
             $data['property_code'] = $propertyCode;
         }
         $data['updated_by'] = $request->user()->id;
-        $data['tipo'] = $this->resolveTipo($data['for_sale'] ?? false, $data['for_rent'] ?? false);
-        $data['is_featured'] = $request->boolean('is_featured');
-        $data['administracion_incluida'] = $request->boolean('for_rent')
-            ? $request->boolean('administracion_incluida')
-            : null;
+        $data['tipo'] = $this->resolveTipo($data['for_sale'], $data['for_rent']);
         $data['ciudad'] = \App\Models\City::find($data['city_id'])->name ?? $data['ciudad'] ?? $property->ciudad;
         $data['slug'] = $this->resolvePropertySlug($data, $property);
 
@@ -245,6 +239,13 @@ class PropertiesController extends Controller
             $data['published_at'] = null;
         }
 
+        unset(
+            $data['remove_main_image'],
+            $data['remove_gallery'],
+            $data['clear_gallery'],
+            $data['gallery_order']
+        );
+
         $property->update($data);
 
         return redirect()->route('dashboard.properties.index')
@@ -281,6 +282,54 @@ class PropertiesController extends Controller
     private function resolvePropertySlug(array $data, ?Property $property = null): string
     {
         return $this->slugGenerator->generate($data, $property);
+    }
+
+    private function normalizePropertyData(PropertyStoreRequest|PropertyUpdateRequest $request, array $data): array
+    {
+        $data['for_sale'] = $request->boolean('for_sale');
+        $data['for_rent'] = $request->boolean('for_rent');
+        $data['is_featured'] = $request->boolean('is_featured');
+        $data['is_conjunto'] = $request->boolean('is_conjunto');
+        $data['clear_gallery'] = $request->boolean('clear_gallery');
+        $data['remove_main_image'] = $request->boolean('remove_main_image');
+
+        $data['administracion_incluida'] = $data['for_rent']
+            ? $this->nullableBoolean($request->input('administracion_incluida'))
+            : null;
+
+        $data['sale_currency'] = $data['for_sale']
+            ? ($request->input('sale_currency') ?: 'COP')
+            : 'COP';
+
+        $data['rent_currency'] = $data['for_rent']
+            ? ($request->input('rent_currency') ?: 'COP')
+            : 'COP';
+
+        $data['tiene_parqueadero'] = $this->nullableBoolean($request->input('tiene_parqueadero'));
+        $data['tiene_bodega'] = $this->nullableBoolean($request->input('tiene_bodega'));
+
+        if (!$data['for_sale']) {
+            $data['sale_price'] = null;
+        }
+
+        if (!$data['for_rent']) {
+            $data['rent_price'] = null;
+        }
+
+        if (!$data['is_conjunto']) {
+            $data['conjunto_nombre'] = null;
+        }
+
+        return $data;
+    }
+
+    private function nullableBoolean(mixed $value): ?bool
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
     }
 
     private function slugExists(string $modelClass, string $slug, ?int $ignoreId = null): bool
